@@ -9,5 +9,7 @@
         <h1>Entry was not found :(</h1>
     {% else %}
         {{ entry }}
+        <br/>
+        <a href="../editpage/{{ name }}">Edit entry!</a>
     {% endif %}
 {% endblock %}
