@@ -44,8 +44,6 @@ def entry(request, name):
     add_ul(new)
     # https://www.simplilearn.com/tutorials/python-tutorial/list-to-string-in-python#:~:text=To%20convert%20a%20list%20to%20a%20string%2C%20use%20Python%20List,and%20return%20it%20as%20output.
     entry = ' '.join(new)
-    # print(split)
-    # print(new)
     return render(request, "encyclopedia/entry.html", {
         "entry": entry,
         "name": name
@@ -64,17 +62,7 @@ def search(request):
         return render(request, "encyclopedia/search_results.html", {
             "entries": match
         })
-    '''entries = util.list_entries()
-    for entry in entries:
-        if name in entry:
-            name = entry'''
     return HttpResponseRedirect(f"../wiki/{name}")
-
-    '''entry = util.get_entry(name)
-    return render(request, "encyclopedia/entry.html", {
-        "entry": entry,
-        "name": name.capitalize()
-    })'''
 
 def newpage(request):
     return render(request, "encyclopedia/newpage.html")
