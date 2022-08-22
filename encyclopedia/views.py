@@ -22,6 +22,7 @@ def entry(request, name):
     split = [element.replace("\r", "") for element in split if element != "" and element != "\r"]
     new = []
     # https://stackoverflow.com/questions/2763750/how-to-replace-only-part-of-the-match-with-python-re-sub
+    # converting each element to html
     for element in split:
         if "#" in element:
             element = re.sub('^# ([a-zA-Z ]+)', r'<h1>\1</h1>', element)
@@ -42,8 +43,10 @@ def entry(request, name):
         else:
             element = re.sub('([a-zA-Z0-9 ]+)', r'<p>\1</p>', element)
         new.append(element)
+    # moving all the li elements into ul
     add_ul(new)
     # https://www.simplilearn.com/tutorials/python-tutorial/list-to-string-in-python#:~:text=To%20convert%20a%20list%20to%20a%20string%2C%20use%20Python%20List,and%20return%20it%20as%20output.
+    # converting our list to string
     entry = ' '.join(new)
     return render(request, "encyclopedia/entry.html", {
         "entry": entry,
@@ -54,15 +57,18 @@ def search(request):
     # https://stackoverflow.com/questions/53920004/add-q-searchterm-in-django-url
     name = request.GET.get('q')
     entry = util.get_entry(name)
+    # if we couldn't find corresponding entry, render page with the results
     if entry == None:
         match = []
         entries = util.list_entries()
+        # checking if our search entry is a substring of any entries
         for entry in entries:
             if name.lower() in entry.lower():
                 match.append(entry)
         return render(request, "encyclopedia/search_results.html", {
             "entries": match
         })
+    # if found a corresponding entry, get redirected to that page
     return HttpResponseRedirect(f"../wiki/{name}")
 
 def newpage(request):
