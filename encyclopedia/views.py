@@ -15,6 +15,11 @@ def index(request):
 
 def entry(request, name):
     entry = util.get_entry(name)
+    if entry == None:
+        return render(request, "encyclopedia/entry.html", {
+        "entry": entry,
+        "name": name
+    })
     # rendering the markdown using the library
     # entry = markdown2.markdown(entry)
     split = entry.split("\n")
@@ -25,23 +30,23 @@ def entry(request, name):
     # converting each element to html
     for element in split:
         if "#" in element:
-            element = re.sub('^# ([a-zA-Z ]+)', r'<h1>\1</h1>', element)
-            element = re.sub('^## ([a-zA-Z ]+)', r'<h2>\1</h2>', element)
-            element = re.sub('^### ([a-zA-Z ]+)', r'<h3>\1</h3>', element)
-            element = re.sub('^#### ([a-zA-Z ]+)', r'<h4>\1</h4>', element)
-            element = re.sub('^##### ([a-zA-Z ]+)', r'<h5>\1</h5>', element)
-            element = re.sub('^###### ([a-zA-Z ]+)', r'<h6>\1</h6>', element)
+            element = re.sub('^# ([^#]+)', r'<h1>\1</h1>', element)
+            element = re.sub('^## ([^#]+)', r'<h2>\1</h2>', element)
+            element = re.sub('^### ([^#]+)', r'<h3>\1</h3>', element)
+            element = re.sub('^#### ([^#]+)', r'<h4>\1</h4>', element)
+            element = re.sub('^##### ([^#]+)', r'<h5>\1</h5>', element)
+            element = re.sub('^###### ([^#]+)', r'<h6>\1</h6>', element)
         elif "**" in element or "__" in element:
-            element = re.sub('\*\*([a-zA-Z ]+)\*\*', r'<b>\1</b>', element)
-            element = re.sub('__([a-zA-Z ]+)__', r'<b>\1</b>', element)
+            element = re.sub('\*\*([^\*]+)\*\*', r'<b>\1</b>', element)
+            element = re.sub('__([^\_]+)__', r'<b>\1</b>', element)
             element = re.sub('(.+)', r'<p>\1</p>', element)
         elif "*" in element:
-            element = re.sub('^\* ([a-zA-Z ]+)', r'<li>\1</li>', element)
-        elif re.match('([\w 0-9]+)\[([a-zA-Z ]+)\]\(([a-zA-Z \/]+)\)', element):
-            element = re.sub('([\w 0-9]+)\[([a-zA-Z ]+)\]\(([a-zA-Z \/]+)\)', r'\1<a href="\3">\2</a>', element)
+            element = re.sub('^\* ([^\*]+)', r'<li>\1</li>', element)
+        elif re.match('([\w 0-9]+)\[([^[]+)\]\(([^\(]+)\)', element):
+            element = re.sub('([\w 0-9]+)\[([^[]+)\]\(([^\(]+)\)', r'\1<a href="\3">\2</a>', element)
             element = re.sub('(.+)', r'<p>\1</p>', element)
         else:
-            element = re.sub('([a-zA-Z0-9 ]+)', r'<p>\1</p>', element)
+            element = re.sub('(.+)', r'<p>\1</p>', element)
         new.append(element)
     # moving all the li elements into ul
     add_ul(new)
