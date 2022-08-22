@@ -42,7 +42,6 @@ def entry(request, name):
             element = re.sub('([a-zA-Z0-9 ]+)', r'<p>\1</p>', element)
         new.append(element)
     add_ul(new)
-    # add_p(new)
     # https://www.simplilearn.com/tutorials/python-tutorial/list-to-string-in-python#:~:text=To%20convert%20a%20list%20to%20a%20string%2C%20use%20Python%20List,and%20return%20it%20as%20output.
     entry = ' '.join(new)
     # print(split)
@@ -124,17 +123,4 @@ def add_ul(new):
     if check == True:
         new.insert(first, "<ul>")
         new.insert(last+2, "</ul>")
-    return new
-
-def add_p(new):
-    check = False
-    index = 0
-    for i in range(len(new)):
-        if "href" in new[i]:
-            check = True
-            index = i
-            break
-    if check == True:
-        new.insert(index, "<p>")
-        new.insert(index+2, "</p>")
     return new
