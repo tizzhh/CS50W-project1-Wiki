@@ -1,12 +1,12 @@
 {% extends "encyclopedia/layout.html" %}
 
 {% block title %}
-    Entry
+    {{ name }}
 {% endblock %}
 
 {% block body %}
     {% if not entry %}
-        <h1>This entry does not exist</h1>
+        <h1>Entry was not found :(</h1>
     {% else %}
         {{ entry }}
     {% endif %}
