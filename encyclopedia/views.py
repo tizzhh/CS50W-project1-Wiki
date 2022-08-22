@@ -18,6 +18,7 @@ def entry(request, name):
     # rendering the markdown using the library
     # entry = markdown2.markdown(entry)
     split = entry.split("\n")
+    # removing leftover \r's and whitespace elements from our list
     split = [element.replace("\r", "") for element in split if element != "" and element != "\r"]
     new = []
     # https://stackoverflow.com/questions/2763750/how-to-replace-only-part-of-the-match-with-python-re-sub
