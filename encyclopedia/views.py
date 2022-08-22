@@ -3,6 +3,7 @@ from html import entities
 import re, os.path, random
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
+import markdown2
 
 from . import util
 
@@ -14,6 +15,38 @@ def index(request):
 
 def entry(request, name):
     entry = util.get_entry(name)
+    # rendering the markdown using the library
+    # entry = markdown2.markdown(entry)
+    split = entry.split("\n")
+    split = [element.replace("\r", "") for element in split if element != "" and element != "\r"]
+    new = []
+    # https://stackoverflow.com/questions/2763750/how-to-replace-only-part-of-the-match-with-python-re-sub
+    for element in split:
+        if "#" in element:
+            element = re.sub('^# ([a-zA-Z ]+)', r'<h1>\1</h1>', element)
+            element = re.sub('^## ([a-zA-Z ]+)', r'<h2>\1</h2>', element)
+            element = re.sub('^### ([a-zA-Z ]+)', r'<h3>\1</h3>', element)
+            element = re.sub('^#### ([a-zA-Z ]+)', r'<h4>\1</h4>', element)
+            element = re.sub('^##### ([a-zA-Z ]+)', r'<h5>\1</h5>', element)
+            element = re.sub('^###### ([a-zA-Z ]+)', r'<h6>\1</h6>', element)
+        elif "**" in element or "__" in element:
+            element = re.sub('\*\*([a-zA-Z ]+)\*\*', r'<b>\1</b>', element)
+            element = re.sub('__([a-zA-Z ]+)__', r'<b>\1</b>', element)
+            element = re.sub('(.+)', r'<p>\1</p>', element)
+        elif "*" in element:
+            element = re.sub('^\* ([a-zA-Z ]+)', r'<li>\1</li>', element)
+        elif re.match('([\w 0-9]+)\[([a-zA-Z ]+)\]\(([a-zA-Z \/]+)\)', element):
+            element = re.sub('([\w 0-9]+)\[([a-zA-Z ]+)\]\(([a-zA-Z \/]+)\)', r'\1<a href="\3">\2</a>', element)
+            element = re.sub('(.+)', r'<p>\1</p>', element)
+        else:
+            element = re.sub('([a-zA-Z0-9 ]+)', r'<p>\1</p>', element)
+        new.append(element)
+    add_ul(new)
+    # add_p(new)
+    # https://www.simplilearn.com/tutorials/python-tutorial/list-to-string-in-python#:~:text=To%20convert%20a%20list%20to%20a%20string%2C%20use%20Python%20List,and%20return%20it%20as%20output.
+    entry = ' '.join(new)
+    # print(split)
+    # print(new)
     return render(request, "encyclopedia/entry.html", {
         "entry": entry,
         "name": name
@@ -75,3 +108,33 @@ def saveentry(request):
 def randompage(request):
     entries = util.list_entries()
     return HttpResponseRedirect(f"../wiki/{random.choice(entries)}")
+
+def add_ul(new):
+    first = 0
+    check = False
+    for i in range(len(new)):
+        if "<li>" in new[i]:
+            check = True
+            first = i
+            break
+    last = 0
+    for i in range(len(new)):
+        if "<li>" in new[i]:
+            last = i
+    if check == True:
+        new.insert(first, "<ul>")
+        new.insert(last+2, "</ul>")
+    return new
+
+def add_p(new):
+    check = False
+    index = 0
+    for i in range(len(new)):
+        if "href" in new[i]:
+            check = True
+            index = i
+            break
+    if check == True:
+        new.insert(index, "<p>")
+        new.insert(index+2, "</p>")
+    return new

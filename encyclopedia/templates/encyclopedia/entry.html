@@ -8,7 +8,7 @@
     {% if not entry %}
         <h1>Entry was not found :(</h1>
     {% else %}
-        {{ entry }}
+        {{ entry|safe }}
         <br/>
         <a href="../editpage/{{ name }}">Edit entry!</a>
     {% endif %}
